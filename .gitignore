@@ -1,0 +1,9 @@
+.vscode
+.idea
+
+build/
+cmake-build*/
+managed_components/
+
+*.old
+*.lock

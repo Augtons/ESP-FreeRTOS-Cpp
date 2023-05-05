@@ -1,0 +1,6 @@
+version: 1.0.0
+description: "This is a FreeRTOS C++ binding."
+# url: "https://github.com/Augtons/xxxxx"
+
+dependencies: 
+  idf: ">=4.4"
