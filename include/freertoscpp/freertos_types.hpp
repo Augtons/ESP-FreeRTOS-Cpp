@@ -36,6 +36,30 @@ namespace augtons
         template<>
         void task_fun<void>(void* _arg);
     }
+
+    namespace freertos {
+        template<typename ArgType>
+        struct FuncType {
+            using type = std::function<void(ArgType)>;
+        };
+
+        template<>
+        struct FuncType<void> {
+            using type = std::function<void()>;
+        };
+
+        template<typename ArgType = void>
+        using FuncType_t = typename FuncType<ArgType>::type;
+    }
+
+    namespace freertos {
+        template<typename ArgType>
+        using InArgType = typename std::conditional<
+                std::is_reference<ArgType>::value,
+                ArgType,
+                const ArgType&
+            >::type;
+    }
 }
 
 #endif

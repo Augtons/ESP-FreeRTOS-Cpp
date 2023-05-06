@@ -8,21 +8,6 @@
 
 namespace augtons {
     namespace freertos {
-        template<typename ArgType>
-        struct FuncType {
-            using type = std::function<void(ArgType)>;
-        };
-
-        template<>
-        struct FuncType<void> {
-            using type = std::function<void()>;
-        };
-
-        template<typename ArgType = void>
-        using FuncType_t = typename FuncType<ArgType>::type;
-    }
-
-    namespace freertos {
         template<typename ArgType = void>
         struct task_shared_data {
             bool has_deleted = false;
@@ -30,9 +15,9 @@ namespace augtons {
             FuncType_t<ArgType> function;
             ArgType args;
 
-            explicit task_shared_data(FuncType_t<ArgType> function, ArgType args)
+            explicit task_shared_data(const FuncType_t<ArgType>& function, InArgType<ArgType> args)
                 : function(function)
-                , args(args) {}
+                , args(std::forward<InArgType<ArgType>>(args)) {}
         };
 
         template<>
@@ -41,7 +26,7 @@ namespace augtons {
             TaskHandle_t task_handle = nullptr;
             FuncType_t<void> function;
 
-            explicit task_shared_data(FuncType_t<> function)
+            explicit task_shared_data(const FuncType_t<>& function)
                 : function(function) {}
         };
 
@@ -184,7 +169,5 @@ void augtons::freertos::task_fun<void>(void* _arg) {
     data->function();
     details::delete_task_from_shared_data(data);
 }
-
-#undef TAG
 
 #endif

@@ -13,12 +13,12 @@ public:
         const char *const name,
         const uint32_t stack_size,
         const UBaseType_t priority,
-        ArgType task_args,
+        InArgType<ArgType> task_args,
         const Func& func,
         BaseType_t core_id = tskNO_AFFINITY
     ) -> task<ArgType> {
 
-        auto data = std::make_shared<task_shared_data<ArgType>>(func, std::forward<ArgType>(task_args));
+        auto data = std::make_shared<task_shared_data<ArgType>>(func, std::forward<InArgType<ArgType>>(task_args));
         auto ret = task<ArgType>(data);
 
         if (xTaskCreatePinnedToCore(task_fun<ArgType>, name, stack_size, ret.shared_data.get(),
@@ -113,9 +113,9 @@ public:
         return *this;
     }
 
-    task<ArgType> bind(ArgType arg, const Func& func) {
+    task<ArgType> bind(InArgType<ArgType> arg, const Func& func) {
         return task_factory<ArgType>::create(m_name, m_stack_size_num, m_priority,
-                                             std::forward<ArgType>(arg), func, m_core_id);
+                                             std::forward<InArgType<ArgType>>(arg), func, m_core_id);
     }
 };
 
