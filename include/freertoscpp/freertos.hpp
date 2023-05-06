@@ -61,6 +61,10 @@ private:
     explicit task(shared_task_data_ptr<Arg> data): shared_data(data) {}
 public:
     task() = default;
+    task(task&) = default;
+    task(task&&) noexcept = default;
+    task& operator=(const task&) = default;
+    task& operator=(task&&) noexcept = default;
 
     task& operator=(nullptr_t) {
         this->~task();
@@ -95,7 +99,7 @@ public:
         return shared_data->has_deleted;
     }
 
-    TaskHandle_t native_handle() const {
+    TaskHandle_t native_handle_not_null() const {
         if (is_null()) {
             FreeRTOSCpp_LogE("Calling \"native_handle()\" on a null task object.");
             FreeRTOSCpp_LogE("You can use \"native_handle_or_null()\" instead.");
@@ -108,7 +112,7 @@ public:
         return shared_data->task_handle;
     }
 
-    TaskHandle_t native_handle_or_null() const {
+    TaskHandle_t native_handle() const {
         if (is_null()) {
             return nullptr;
         }
