@@ -62,4 +62,11 @@ namespace augtons
     }
 }
 
+namespace augtons {
+    namespace freertos {
+        template<typename T>
+        class queue;
+    }
+}
+
 #endif

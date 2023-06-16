@@ -78,6 +78,7 @@ public:
         if (shared_data.use_count() <= 1 && !(shared_data->has_deleted)) {
             delete_task();
         }
+        shared_data = nullptr;
     }
 
     inline long use_count() const {
@@ -88,7 +89,7 @@ public:
     }
 
     inline bool is_null() const {
-        return shared_data == nullptr;
+        return shared_data == nullptr || shared_data->task_handle == nullptr;
     }
 
     inline bool has_deleted() const {
@@ -102,7 +103,7 @@ public:
     TaskHandle_t native_handle_not_null() const {
         if (is_null()) {
             FreeRTOSCpp_LogE("Calling \"native_handle()\" on a null task object.");
-            FreeRTOSCpp_LogE("You can use \"native_handle_or_null()\" instead.");
+            FreeRTOSCpp_LogE("You can use \"native_handle()\" instead.");
             abort();
         }
         if (shared_data->task_handle == nullptr) {
