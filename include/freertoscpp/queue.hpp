@@ -132,7 +132,8 @@ public:
         if (is_null() || has_deleted()) {
             return;
         }
-        T* new_data = new T(std::move(data));    // 重新new一次延长右值的生命周期
+        T* new_data = new T(std::move(data));    // 重新new一次，通过移动右值来延长生命周期(C+17前)
+                                                 // 重新new一次，将临时量实质化(C++17起)
         xQueueSend(shared_data->handle, &new_data, timeout);
     }
 
@@ -145,7 +146,7 @@ public:
         return xQueueSend(shared_data->handle, &new_data, timeout);
     }
 
-    bool receive(T& out, TickType_t timeout = portMAX_DELAY) const {
+    bool receive_to(T& out, TickType_t timeout = portMAX_DELAY) const {
         if (is_null() || has_deleted()) {
             return false;
         }
@@ -159,6 +160,23 @@ public:
             return false;
         }
     }
+
+#if __cplusplus >= 201703L
+    std::optional<T> receive(TickType_t timeout = portMAX_DELAY) const {
+        if (is_null() || has_deleted()) {
+            return std::nullopt;
+        }
+        T* new_data = nullptr;
+        if (xQueueReceive(shared_data->handle, &new_data, timeout) == pdTRUE) {
+            assert(new_data);
+            T out = std::move(*new_data);
+            delete new_data;
+            return out;
+        } else {
+            return std::nullopt;
+        }
+    }
+#endif
 
     T receive_forever() const {
         if (is_null() || has_deleted()) {
