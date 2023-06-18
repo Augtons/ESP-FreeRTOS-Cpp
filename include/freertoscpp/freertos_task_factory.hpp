@@ -9,6 +9,16 @@ class augtons::freertos::task_factory {
     using Func = FuncType_t<ArgType>;
 public:
 
+    static void task_fun(void* _arg) {
+        auto *data = (task_shared_data<ArgType>*)(_arg);
+        if (data == nullptr) {
+            FreeRTOSCpp_LogE("Unexpected situation: the argument received by the native task function is NULL.");
+            abort();
+        }
+        data->function(std::forward<ArgType>(data->args));
+        details::delete_task_from_shared_data(data);
+    }
+
     static auto create(
         const char *const name,
         const uint32_t stack_size,
@@ -21,7 +31,7 @@ public:
         auto data = std::make_shared<task_shared_data<ArgType>>(func, std::forward<InArgType<ArgType>>(task_args));
         auto ret = task<ArgType>(data);
 
-        if (xTaskCreatePinnedToCore(task_fun<ArgType>, name, stack_size, ret.shared_data.get(),
+        if (xTaskCreatePinnedToCore(task_fun, name, stack_size, ret.shared_data.get(),
                         priority, &ret.shared_data->task_handle, core_id) != pdPASS) {
             ret = nullptr;
         }
@@ -36,6 +46,16 @@ class augtons::freertos::task_factory<void> {
 
 public:
 
+    static void task_fun(void* _arg) {
+        auto *data = (task_shared_data<>*)(_arg);
+        if (data == nullptr) {
+            FreeRTOSCpp_LogE("Unexpected situation: the argument received by the native task function is NULL.");
+            abort();
+        }
+        data->function();
+        details::delete_task_from_shared_data(data);
+    }
+
     static auto create(
         const char *const name,
         const uint32_t stack_size,
@@ -45,7 +65,7 @@ public:
     ) -> task<> {
         auto data = std::make_shared<task_shared_data<>>(func);
         auto ret = task<>(data);
-        if (xTaskCreatePinnedToCore(task_fun<void>, name, stack_size, ret.shared_data.get(),
+        if (xTaskCreatePinnedToCore(task_fun, name, stack_size, ret.shared_data.get(),
                                     priority, &ret.shared_data->task_handle, core_id) != pdPASS) {
             ret = nullptr;
         }

@@ -153,26 +153,4 @@ public:
     }
 };
 
-template<typename ArgType>
-void augtons::freertos::task_fun(void* _arg) {
-    auto *data = (task_shared_data<ArgType>*)(_arg);
-    if (data == nullptr) {
-        FreeRTOSCpp_LogE("Unexpected situation: the argument received by the native task function is NULL.");
-        abort();
-    }
-    data->function(std::forward<ArgType>(data->args));
-    details::delete_task_from_shared_data(data);
-}
-
-template<>
-void augtons::freertos::task_fun<void>(void* _arg) {
-    auto *data = (task_shared_data<>*)(_arg);
-    if (data == nullptr) {
-        FreeRTOSCpp_LogE("Unexpected situation: the argument received by the native task function is NULL.");
-        abort();
-    }
-    data->function();
-    details::delete_task_from_shared_data(data);
-}
-
 #endif
