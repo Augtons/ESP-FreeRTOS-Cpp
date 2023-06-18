@@ -177,24 +177,6 @@ public:
         }
     }
 #endif
-
-    T receive_forever() const {
-        if (is_null() || has_deleted()) {
-            FreeRTOSCpp_LogE("Receiving from a null queue");
-            abort();
-        }
-
-        T* new_data = nullptr;
-        BaseType_t err = xQueueReceive(shared_data->handle, &new_data, portMAX_DELAY);
-        if (err != pdTRUE) {
-            FreeRTOSCpp_LogE("Receiving Failed when receive forever, error code = %d", err);
-            abort();
-        }
-        assert(new_data);
-        T ret = std::move(*new_data);
-        delete new_data;
-        return ret;
-    }
 };
 
 #endif //FREERTOS_CPP_QUEUE_HPP

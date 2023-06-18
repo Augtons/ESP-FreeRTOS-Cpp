@@ -1,0 +1,7 @@
+dependencies:
+  FreeRTOS-Cpp:
+    path: "../../.."
+
+files:
+  exclude:
+    - "**/cmake-build*/**/*"
