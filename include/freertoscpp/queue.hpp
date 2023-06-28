@@ -128,13 +128,14 @@ public:
         return false;
     }
 
-    void send(T&& data, TickType_t timeout = portMAX_DELAY) const {
+    BaseType_t send(T&& data, TickType_t timeout = portMAX_DELAY) const {
         if (is_null() || has_deleted()) {
-            return;
+            return pdFAIL;
         }
         T* new_data = new T(std::move(data));    // 重新new一次，通过移动右值来延长生命周期(C+17前)
-                                                 // 重新new一次，将临时量实质化(C++17起)
-        xQueueSend(shared_data->handle, &new_data, timeout);
+                                                 // 重新new一次，将临时量实质化(C++17起)用于传入队列
+        assert(new_data);
+        return xQueueSend(shared_data->handle, &new_data, timeout);
     }
 
     BaseType_t send(T& data, TickType_t timeout = portMAX_DELAY) const { // 不要加const
