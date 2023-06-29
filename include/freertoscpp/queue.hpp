@@ -5,6 +5,7 @@
 #ifndef FREERTOS_CPP_QUEUE_HPP
 #define FREERTOS_CPP_QUEUE_HPP
 
+#include <optional>
 #include "freertos.hpp"
 #include "freertos/queue.h"
 
