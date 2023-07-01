@@ -22,7 +22,10 @@ jobs:
 
       - name: Get Component Version
         id: get-version
-        run: echo "VERSION=$(python ./ci/get-version.py ./idf_component.yml)" >> "$GITHUB_OUTPUT"
+        run: |
+          VERSION=$(python ./ci/get-version.py ./idf_component.yml)
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Got Version: ${{ steps.get-version.outputs.VERSION }}"
       
       - name: Show IDF Component Manager Version
         run: pip show idf-component-manager
