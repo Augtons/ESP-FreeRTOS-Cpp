@@ -1,6 +1,7 @@
 .vscode
 .idea
 
+/dist/
 build/
 cmake-build*/
 managed_components/

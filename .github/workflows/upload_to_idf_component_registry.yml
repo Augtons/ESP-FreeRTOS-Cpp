@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       IDF_COMPONENT_API_TOKEN: ${{ secrets.IDF_COMPONENT_API_TOKEN }}
-      VERSION: ${{ github.event.release.tag_name }}
     
     steps:
       - uses: actions/checkout@v3
@@ -18,15 +17,24 @@ jobs:
         with:
           python-version: '3.11'
 
-      - run: pip install --upgrade idf-component-manager
+      - name: Get Component Version
+        id: get-version
+        run: echo "VERSION=$(python ./ci/get-version.py ./idf_component.yml)" >> "$GITHUB_OUTPUT"
+
+      - name: Install IDF Component Manager
+        run: pip install --upgrade idf-component-manager
       
       - name: Show IDF Component Manager Version
         run: pip show idf-component-manager
       
       - name: Upload Component
         if: github.event.action == 'published'
-        run: compote component upload --namespace augtons --name FreeRTOS-Cpp --allow-existing --version ${{ env.VERSION }}
+        run: >
+          compote component upload --namespace augtons --name FreeRTOS-Cpp
+          --allow-existing --version ${{ steps.get-version.outputs.VERSION }}
         
       - name: Delete Component
         if: github.event.action == 'deleted'
-        run: compote component delete --namespace augtons --name FreeRTOS-Cpp --version ${{ env.VERSION }}
+        run: >
+          compote component delete --namespace augtons --name FreeRTOS-Cpp
+          --version ${{ steps.get-version.outputs.VERSION }}
