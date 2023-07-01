@@ -16,13 +16,13 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: '3.11'
+          
+      - name: Install IDF Component Manager
+        run: pip install --upgrade idf-component-manager
 
       - name: Get Component Version
         id: get-version
         run: echo "VERSION=$(python ./ci/get-version.py ./idf_component.yml)" >> "$GITHUB_OUTPUT"
-
-      - name: Install IDF Component Manager
-        run: pip install --upgrade idf-component-manager
       
       - name: Show IDF Component Manager Version
         run: pip show idf-component-manager
