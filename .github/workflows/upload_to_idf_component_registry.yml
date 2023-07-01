@@ -1,18 +1,31 @@
 name: Upload To IDF Component Registry
 
-on: workflow_dispatch
+on: 
+  release:
+    - types: [published, unpublished]
 
 jobs: 
   upload:
     name: upload_to_idf_component_registry
     runs-on: ubuntu-latest
+    env:
+      IDF_COMPONENT_API_TOKEN: ${{ secrets.IDF_COMPONENT_API_TOKEN }}
+    
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
           python-version: '3.11'
+
       - run: pip install --upgrade idf-component-manager
-      - name: Upload component
-        env:
-          IDF_COMPONENT_API_TOKEN: ${{ secrets.IDF_COMPONENT_API_TOKEN }}
-        run: compote component upload --namespace augtons --name FreeRTOS-Cpp
+      
+      - name: Show IDF Component Manager Version
+        run: pip show idf-component-manager
+      
+      - name: Upload Component
+        if: github.event.action == 'published'
+        run: compote component upload --namespace augtons --name FreeRTOS-Cpp --allow-existing
+        
+      - name: Delete Component
+        if: github.event.action == 'unpublished'
+        run: compote component delete --namespace augtons --name FreeRTOS-Cpp
