@@ -1,8 +1,28 @@
 # FreeRTOS Binging For ESP-IDF
 
+This is a FreeRTOS C++ binding. Supports some advanced C++ features.
+
+The current supported FreeRTOS features: Task, Queue, Semaphores and Mutex.
+
+# Contents
+
+- [FreeRTOS Binging For ESP-IDF](#freertos-binging-for-esp-idf)
+- [Installation](#installation)
+- [Getting Started](#getting-started)
+  - [1. Tasks](#1-tasks)
+    - [(1) Creating](#1-creating)
+      - [a) Without Arguments:](#a-without-arguments)
+      - [b) With Arguments:](#b-with-arguments)
+    - [(2) Deleting.](#2-deleting)
+      - [Delete itself](#delete-itself)
+      - [Delete by `task<...>` object](#delete-by-task-object)
+    - [(3) Get Native Task Handle (TaskHandle_t)](#3-get-native-task-handle-taskhandle_t)
+    - [(4) Reference count.](#4-reference-count)
+  - [2. Queue](#2-queue)
+  - [3. Semaphores and Mutex](#3-semaphores-and-mutex)
+
+
 # Installation
-
-
 
 ```yaml
 # idf_component.yml
@@ -13,9 +33,16 @@ dependencies:
 
 # Getting Started
 
-## 1. Create Task
+## 1. Tasks
 
-### Without Arguments:
+Please refer to examples:
+ - `get-started`, [Click Here](examples/get-started/main/get-started.cpp)
+
+ - `reference_count`, [Click Here](examples/reference_count/main/reference_count.cpp)
+
+### (1) Creating
+
+#### a) Without Arguments:
 
 ```cpp
 task<> your_task = task_builder<>("task name")
@@ -52,7 +79,7 @@ void task_function() {
 task<> your_task = task_factory<>::create("task name", 2048, 0, task_function);
 ```
 
-### With Arguments:
+#### b) With Arguments:
 
 Next, using C++ reference types as an example, please note that during the task execution, the reference must remain valid (for example, int a = 0 in the following example must not go out of scope)
 
@@ -95,9 +122,9 @@ task<int&> your_task = task_factory<int&>::create("task name", 2048, 0, a, [](in
 });
 ```
 
-## 2. Delete a task.
+### (2) Deleting.
 
-### Delete itself
+#### Delete itself
 
 It will be deleted automatically when its task function returns.
 
@@ -113,7 +140,7 @@ task<> your_task = task_factory<>::create("task name", 2048, 0, [] {
 
 > Note: **Don't** use `vTaskDelete(NULL)` to delete it! Memory leaks will occur.
 
-### Delete by `task<...>` object
+#### Delete by `task<...>` object
 
 The Safe Way:
 
@@ -124,7 +151,7 @@ your_task.delete_task();
 > Note: **Don't** use `vTaskDelete((TaskHandle_t)your_task)` to delete it. Memory leaks will occur.
 
 
-# 3. Get Native Task Handle (TaskHandle_t)
+### (3) Get Native Task Handle (TaskHandle_t)
 
 ```cpp
 // The first way.
@@ -155,7 +182,7 @@ auto handle = (TaskHandle_t)t2;             // nullptr
 ```
 
 
-# 4. Reference count.
+### (4) Reference count.
 
 When the reference count of a `task<>` object is 0, the FreeRTOS Task will be deleted.
 
@@ -194,3 +221,11 @@ t1 = std::move(t4);
 t1.use_count();   // 1
 
 ```
+
+## 2. Queue
+
+Please refer to examples `queue`, [Click Here](examples/queue/main/queue.cpp)
+
+## 3. Semaphores and Mutex
+
+Please refer to examples `semaphore`, [Click Here](examples/semaphore/main/semaphore.cpp)
