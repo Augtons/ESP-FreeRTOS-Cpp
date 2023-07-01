@@ -2,7 +2,7 @@ name: Upload To IDF Component Registry
 
 on: 
   release:
-    - types: [published, unpublished]
+    types: [published, unpublished]
 
 jobs: 
   upload:
