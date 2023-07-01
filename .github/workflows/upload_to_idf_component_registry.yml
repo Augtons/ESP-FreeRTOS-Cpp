@@ -2,7 +2,7 @@ name: Upload To IDF Component Registry
 
 on: 
   release:
-    types: [published, unpublished]
+    types: [published, deleted]
 
 jobs: 
   upload:
@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       IDF_COMPONENT_API_TOKEN: ${{ secrets.IDF_COMPONENT_API_TOKEN }}
+      VERSION: ${{ github.event.release.tag_name }}
     
     steps:
       - uses: actions/checkout@v3
@@ -24,8 +25,8 @@ jobs:
       
       - name: Upload Component
         if: github.event.action == 'published'
-        run: compote component upload --namespace augtons --name FreeRTOS-Cpp --allow-existing
+        run: compote component upload --namespace augtons --name FreeRTOS-Cpp --allow-existing --version ${{ env.VERSION }}
         
       - name: Delete Component
-        if: github.event.action == 'unpublished'
-        run: compote component delete --namespace augtons --name FreeRTOS-Cpp
+        if: github.event.action == 'deleted'
+        run: compote component delete --namespace augtons --name FreeRTOS-Cpp --version ${{ env.VERSION }}
