@@ -1,4 +1,4 @@
-version: 1.0.0
+version: 1.0.1
 description: "This is a FreeRTOS C++ binding. Supports some advanced C++ features."
 url: "https://github.com/Augtons/ESP-FreeRTOS-Cpp"
 
