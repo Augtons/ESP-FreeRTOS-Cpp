@@ -2,6 +2,7 @@
 #define FREERTOS_CPP_TYPES_HPP
 
 #include <functional>
+#include "esp_log.h"
 
 #define FreeRTOSCpp_LogI(FORMAT, ...) \
     ESP_LOGI("FreeRTOS-Cpp", FORMAT, ##__VA_ARGS__)
